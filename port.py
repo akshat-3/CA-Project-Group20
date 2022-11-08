@@ -1,9 +1,11 @@
-class Port():
-    def __init__(self, a, b):
-        self.flag = 0
-        self.end_1 = a
-        self.end_2 = b
+import Clock
 
-    def sender_switch(self):
-        self.flag+= 1
-        self.flag= self.flag%2
+class Port():
+    def __init__(self):
+        self.input_edge = None
+        self.output_edge = None
+    
+    def setPort(self, a, b):
+        self.input_edge = a
+        self.output_edge = b
+

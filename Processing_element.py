@@ -1,6 +1,6 @@
-import Port
+import port
 
-class PE():
-    def __init__(self, P):
-        self.Port= P
-
+class pe():
+    def __init__(self):
+        self.input_port= None
+        self.output_port= None

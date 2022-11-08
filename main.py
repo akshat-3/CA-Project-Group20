@@ -1,6 +1,8 @@
 import fileinput
-import Clock
+from Clock import *
 import Packet
+from Mesh import *
+
 input = []
 
 for line in fileinput.input(files='Input'):
@@ -16,10 +18,39 @@ for line in fileinput.input(files='Input'):
     if (len(A[-1]) == 96):
         input.append(A)
 
+
+processed_input = []
+
 for line in input:
+    injectCycle = line[0]
     source = line[1]
     dest = line[2]
-    injectCycle = line[0]
     payload = line[3]
     packet = Packet.Packet(payload, source, dest, injectCycle)
-    print(packet.flit())
+    input_line = [injectCycle,source,dest]+packet.flit()
+    processed_input.append(input_line)
+
+
+clk = Clock()
+clk.startClock()
+Mesh2D = Mesh()
+
+for data in processed_input:
+    if(data[0]==clk.count):
+        #inject data
+        if(data[1]=="A"):
+            pass
+        if(data[1]=="B"):
+            pass
+        if(data[1]=="C"):
+            pass
+        if(data[1]=="D"):
+            pass
+    
+    
+    clk.updateCycle()
+
+
+clk.stopClock()
+
+print(processed_input)
