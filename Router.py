@@ -12,7 +12,7 @@ class Router():
         self.XCurrent = 0
         self.YCurrent = 0
         self.ports = port()        
-        elfr)f.buffernp.=np.empty(5, dtype=string)
+        self.buffer=np.empty(5, dtype=string)
     
     def XYrouting(self,Xdest,Ydest):
         Xoffset = Xdest-self.XCurrent
