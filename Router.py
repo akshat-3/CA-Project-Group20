@@ -156,37 +156,41 @@ class Router():
             for i in range(0,5):
                 if(self.pe_buffer[i]=="0"*34):
                     return i
-    def update(self):
+
+    def update(self,clock):
         if self.send_flag==1:
-            self.send.send()
+            #print('count',self.send.count)
+            self.send.send(clock)
             if(self.send.count==5):
-                self.send_flag= 0
+                #print('done', self.XCurrent, self.YCurrent)
+                self.send_flag = 0
             pass
         elif self.isempty_pe_buffer()==False:
-            print('1')
-            self.send= Sending(self, self.pe_buffer)
+            #print('1')
+            self.send= Sending(self, self.pe_buffer, 'PE')
             self.pe_buffer= ["0"*34]*5
             self.send_flag= 1
         elif self.isempty_west_buffer()==False:
-            print('2')
-            self.send= Sending(self, self.west_buffer)
+            #print('2')
+            self.send= Sending(self, self.west_buffer, 'WEST')
             self.west_buffer= ["0"*34]*5
             self.send_flag= 1
         elif self.isempty_north_buffer()==False:
-            print('3')
-            self.send= Sending(self, self.north_buffer)
+            #print('3')
+            self.send= Sending(self, self.north_buffer, 'NORTH')
             self.north_buffer= ["0"*34]*5
             self.send_flag= 1
         elif self.isempty_east_buffer()==False:
-            print('4')
-            self.send= Sending(self, self.east_buffer)
+            #print('4')
+            self.send= Sending(self, self.east_buffer, 'EAST')
             self.east_buffer= ["0"*34]*5
             self.send_flag= 1
         elif self.isempty_south_buffer()==False:
-            print('5')
-            self.send= Sending(self, self.south_buffer)
+            #print('5')
+            self.send= Sending(self, self.south_buffer, 'SOUTH')
             self.south_buffer= ["0"*34]*5
             self.send_flag= 1
+            #print('empty',self.XCurrent,self.YCurrent)
         
         # if self.isempty_pe_buffer()==True:
         #     self.startRouting('PE')

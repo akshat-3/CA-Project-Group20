@@ -1,24 +1,46 @@
+import logging
+
+logging.basicConfig(filename="Logfile.log",filemode='a')
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+
 
 class Sending:
-    def __init__(self, Router, buffer):
-        print('helo')
+    def __init__(self, Router, buffer, direction):
+        #print('helo')
         self.count = 0
         self.buffer = buffer
         self.router = Router
         self.router_send = None
+        self.dict = {'00':'A','01':'B','11':'C','10':'D'}
+        self.directions = direction
         self.calculateReceiver()
+        
 
     def calculateReceiver(self):
         #print('bufer',self.buffer)
         if self.router.XCurrent == int(self.buffer[0][28]) and self.router.YCurrent == int(self.buffer[0][29]):
-            print(self.router.XCurrent, self.router.YCurrent, self.router.north_buffer, self.router.south_buffer, self.router.east_buffer, self.router.west_buffer)
+            #print("halo\n")
+            #print(self.router.XCurrent, self.router.YCurrent, self.router.north_buffer, self.router.south_buffer, self.router.east_buffer, self.router.west_buffer)
+            if(self.router != None):
+                if(self.directions == "NORTH"):
+                    self.router.north_buffer = ["0"*34]*5
+                elif(self.directions == "WEST"):
+                    self.router.west_buffer = ["0"*34]*5
+                elif(self.directions == "SOUTH"):
+                    self.router.south_buffer = ["0"*34]*5
+                elif(self.directions == "EAST"):
+                    self.router.east_buffer = ["0"*34]*5
+                elif(self.directions == "PE"):
+                    self.router.pe_buffer = ["0"*34]*5
+            
         else:
             moveX,moveY = self.router.switchAllocator(self.buffer[0][28],self.buffer[0][29])
             if(self.router.neighbour_list[0].XCurrent == moveX and self.router.neighbour_list[0].YCurrent == moveY):
                 self.router_send = self.router.neighbour_list[0]
             if(self.router.neighbour_list[1].XCurrent == moveX and self.router.neighbour_list[1].YCurrent == moveY):
                 self.router_send = self.router.neighbour_list[1]
-        #print(moveX,moveY)
+            #print('yo',moveX,moveY)
             if(moveX == self.router.XCurrent - 1):
                 self.direction = "SOUTH"
             elif(moveX == self.router.XCurrent + 1):
@@ -32,9 +54,11 @@ class Sending:
     def get_coord(self):
         return(self.x, self.y)
 
-    def send(self):
-        #print(self.count)
+    def send(self,clock):
         if(self.router_send != None):
+            route = self.dict[str(self.router_send.XCurrent)+str(self.router_send.YCurrent)]
+            route_self = self.dict[str(self.router.XCurrent)+str(self.router.YCurrent)]
+            logger.info('Router: ' + route + " Received from router " +route_self+ " at clock cycle: "+ str(clock) +  ' Flit received: '+ self.buffer[self.count])
             if(self.direction == "NORTH"):
                 self.router_send.north_buffer[self.count] = self.buffer[self.count]
                 #print(self.router_send.north_buffer[self.count])
@@ -47,6 +71,6 @@ class Sending:
             elif(self.direction == "EAST"):
                 self.router_send.east_buffer[self.count] = self.buffer[self.count]
                 #print(self.router_send.east_buffer[self.count])
-            self.count+=1
+        self.count+=1
                 
             
