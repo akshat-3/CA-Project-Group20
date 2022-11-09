@@ -1,5 +1,5 @@
-import numpy as np
-import port as port
+from port import *
+from crossbar import *
 import Processing_element
 
 class Router():
@@ -13,7 +13,7 @@ class Router():
         
         self.XCurrent = X
         self.YCurrent = Y
-
+        self.crossbar = CrossBar()
         self.pe= Processing_element.pe()
 
         self.north_input_port = None
@@ -34,12 +34,14 @@ class Router():
         self.west_buffer=["0"*34]*5
         self.pe_buffer=["0"*34]*5
 
-        port_pr= port()
+        self.neighbour_list = []
+
+        port_pr= Port()
         self.pe.input_port= port_pr
         self.pe_output_port= port_pr
         port_pr.setPort(self.pe.input_port, self.pe_output_port)
 
-        port_rp= port()
+        port_rp= Port()
         self.pe_input_port= port_rp
         self.pe.output_port= port_rp
         port_rp.setPort(self.pe_input_port, self.pe.input_port)
@@ -48,13 +50,13 @@ class Router():
         Xoffset = Xdest-self.XCurrent
         Yoffset = Ydest-self.YCurrent
         if Xoffset<0:
-            return self.XCurrent - 1
+            return self.XCurrent - 1,self.YCurrent
         if Xoffset>0:
-            return self.XCurrent + 1
+            return self.XCurrent + 1,self.YCurrent
         if Xoffset==0 and Yoffset<0:
-            return self.YCurrent + 1
+            return self.YCurrent + 1,self.XCurrent
         if Xoffset==0 and Yoffset>0:
-            return self.YCurrent - 1
+            return self.YCurrent - 1,self.XCurrent
 
     def ifchannel(self, Xoff, Yoff):
         if Xoff==0 and Yoff==0:
@@ -93,4 +95,55 @@ class Router():
             return router.isempty_east_buffer()
         elif(dir=="WEST"):
             return router.isempty_west_buffer()
-        
+
+    def shiftNBuffer(self):
+        for i in range(0,4):
+            self.north_buffer[i] = self.north_buffer[i+1]
+
+        self.north_buffer[4] = "0"*34
+
+    def shiftSBuffer(self):
+        for i in range(0,4):
+            self.south_buffer[i] = self.south_buffer[i+1]
+
+        self.south_buffer[4] = "0"*34
+    
+    def shiftEBuffer(self):
+        for i in range(0,4):
+            self.east_buffer[i] = self.east_buffer[i+1]
+
+        self.east_buffer[4] = "0"*34
+    
+    def shiftWBuffer(self):
+        for i in range(0,4):
+            self.west_buffer[i] = self.west_buffer[i+1]
+
+        self.west_buffer[4] = "0"*34
+
+#add suport for other router
+    def updateRouter(self):
+        if self.north_buffer[0] != "0"*34:
+            if(self.north_buffer[0][32:] == "00"):
+                moveX,moveY = self.switchAllocator(self.north_buffer[0][28:30][0], self.north_buffer[0][28:30][1])
+                if(moveX == self.XCurrent - 1):
+                    self.crossbar.makeconnection(self.north_input_port,self.west_output_port,"EAST")
+                elif(moveX == self.XCurrent + 1):
+                    self.crossbar.makeconnection(self.north_input_port,self.east_output_port,"WEST")
+                elif(moveY == self.YCurrent - 1):
+                    self.crossbar.makeconnection(self.north_input_port,self.south_output_port,"NORTH")
+                elif(moveY == self.YCurrent + 1):
+                    self.crossbar.makeconnection(self.north_input_port,self.north_output_port,"SOUTH")
+    
+                self.crossbar.sendFlit(self.north_input_port,self.north_buffer[0])
+                self.shiftNBuffer()
+                
+            elif(self.north_buffer[0][32:] == "01"):
+                self.crossbar.sendFlit(self.north_input_port,self.north_buffer[0])
+                self.shiftNBuffer()
+
+            elif(self.north_buffer[0][32:] == "10"):
+                self.crossbar.sendFlit(self.north_input_port,self.north_buffer[0])
+                self.shiftNBuffer()
+                self.crossbar.deleteConnection(self.north_input_port)
+    
+       

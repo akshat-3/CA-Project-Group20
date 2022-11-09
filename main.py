@@ -1,5 +1,5 @@
 import fileinput
-from Clock import *
+import Clock
 import Packet
 from Mesh import *
 
@@ -9,15 +9,13 @@ for line in fileinput.input(files='Input'):
     A = line.split(' ')
     for i in range(len(A)):
         j = A[i]
-        if (j == '\n'):
+        if (j == '\n' or j == '\r'):
             A.remove(j)
-        elif ('\n' in j):
-            j = j[0:len(j)-1]
+        elif ('\r' in j):
+            j = j[0:len(j)-2]
             A[i] = j
-
     if (len(A[-1]) == 96):
         input.append(A)
-
 
 processed_input = []
 
@@ -31,26 +29,17 @@ for line in input:
     processed_input.append(input_line)
 
 
-clk = Clock()
+clk = Clock.Clock()
 clk.startClock()
 Mesh2D = Mesh()
+i = 0
+while(1):
+    if(i < len(processed_input) and int(processed_input[i][0])==clk.count):
+        print("Injecting packet at cycle: ",clk.count)
+        Mesh2D.inject(processed_input[i])
+        i = i+1
 
-for data in processed_input:
-    if(data[0]==clk.count):
-        #inject data
-        if(data[1]=="A"):
-            pass
-        if(data[1]=="B"):
-            pass
-        if(data[1]=="C"):
-            pass
-        if(data[1]=="D"):
-            pass
-    
-    
+    Mesh2D.update()
     clk.updateCycle()
 
-
 clk.stopClock()
-
-print(processed_input)
