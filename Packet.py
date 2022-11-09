@@ -2,7 +2,7 @@ class Packet():
     def __init__(self,Payload,Source,Destination,InjectCycleNum):
         self.Payload = Payload
         self.Source = Source
-        self.dict = {"A":"00","B":"01","C":"10","D":"11"}
+        self.dict = {"A":"00","B":"01","C":"11","D":"10"}
         self.Destination = Destination
         self.InjectCycleNum = InjectCycleNum
 

@@ -4,9 +4,9 @@ from port import *
 class Mesh():
     def __init__(self):
         self.router_a= Router(0, 0)
-        self.router_b= Router(1, 0)
+        self.router_b= Router(0, 1)
         self.router_c= Router(1, 1)
-        self.router_d= Router(0, 1)
+        self.router_d= Router(1, 0)
 
         #self.routers = [self.router_a, self.router_b, self.router_c, self.router_d]
 
@@ -62,34 +62,34 @@ class Mesh():
         self.router_c.ports_list = [port_cb, port_cd]
         self.router_d.ports_list = [port_da, port_dc]
     
-    def buff_check(self):
-        if(self.router_a.pe_buffer[0]!=["0"*34]):
-            dummy()
-        if(self.router_a.south_buffer[0]!=["0"*34]):
-            dummy()
-        if(self.router_a.east_buffer[0]!=["0"*34]):
-            dummy()
-        if(self.router_b.pe_buffer[0]!=["0"*34]):
-            dummy()
-        if(self.router_b.west_buffer[0]!=["0"*34]):
-            dummy()
-        if(self.router_b.south_buffer[0]!=["0"*34]):
-            dummy()
-        if(self.router_c.pe_buffer[0]!=["0"*34]):
-            dummy()
-        if(self.router_c.west_buffer[0]!=["0"*34]):
-            dummy()
-        if(self.router_c.north_buffer[0]!=["0"*34]):
-            dummy()
-        if(self.router_d.pe_buffer[0]!=["0"*34]):
-            dummy()
-        if(self.router_d.north_buffer[0]!=["0"*34]):
-            dummy()
-        if(self.router_d.east_buffer[0]!=["0"*34]):
-            dummy()
+    # def buff_check(self):
+    #     if(self.router_a.pe_buffer[0]!=["0"*34]):
+    #         dummy()
+    #     if(self.router_a.south_buffer[0]!=["0"*34]):
+    #         dummy()
+    #     if(self.router_a.east_buffer[0]!=["0"*34]):
+    #         dummy()
+    #     if(self.router_b.pe_buffer[0]!=["0"*34]):
+    #         dummy()
+    #     if(self.router_b.west_buffer[0]!=["0"*34]):
+    #         dummy()
+    #     if(self.router_b.south_buffer[0]!=["0"*34]):
+    #         dummy()
+    #     if(self.router_c.pe_buffer[0]!=["0"*34]):
+    #         dummy()
+    #     if(self.router_c.west_buffer[0]!=["0"*34]):
+    #         dummy()
+    #     if(self.router_c.north_buffer[0]!=["0"*34]):
+    #         dummy()
+    #     if(self.router_d.pe_buffer[0]!=["0"*34]):
+    #         dummy()
+    #     if(self.router_d.north_buffer[0]!=["0"*34]):
+    #         dummy()
+    #     if(self.router_d.east_buffer[0]!=["0"*34]):
+    #         dummy()
 
-    def dummy(self):
-        return "Actions bhay router wale"
+    # def dummy(self):
+    #     return "Actions bhay router wale"
 
     def update(self):
         self.router_a.update()

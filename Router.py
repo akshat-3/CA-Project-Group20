@@ -1,6 +1,7 @@
 from port import *
 from crossbar import *
 import Processing_element
+from Sending import *
 
 class Router():
     # 5 ports (input and output)
@@ -15,6 +16,7 @@ class Router():
         self.YCurrent = Y
         self.crossbar = CrossBar()
         self.pe= Processing_element.pe()
+        self.send_flag = 0
 
         self.north_input_port = None
         self.south_input_port = None    
@@ -50,8 +52,6 @@ class Router():
     def switchAllocator(self,Xdest,Ydest):
         Xoffset = int(Xdest)-self.XCurrent
         Yoffset = int(Ydest)-self.YCurrent
-        print("Xoffset: ",Xoffset)
-        print("Yoffset: ",Yoffset)
         if Xoffset<0:
             return self.XCurrent - 1,self.YCurrent
         if Xoffset>0:
@@ -137,39 +137,70 @@ class Router():
 
     def buffer_shuffle(self, dir):
         if(dir=="NORTH"):
-            for i in range(4,0,-1):
-                self.north_buffer[i] = self.north_buffer[i-1]
-            self.north_buffer[0] = "0"*34
+            for i in range(0,5):
+                if(self.north_buffer[i]=="0"*34):
+                    return i
         elif(dir=="SOUTH"):
-            for i in range(4,0,-1):
-                self.south_buffer[i] = self.south_buffer[i-1]
-            self.south_buffer[0] = "0"*34
+            for i in range(0,5):
+                if(self.south_buffer[i]=="0"*34):
+                    return i
         elif(dir=="EAST"):
-            for i in range(4,0,-1):
-                self.east_buffer[i] = self.east_buffer[i-1]
-            self.east_buffer[0] = "0"*34
+            for i in range(0,5):
+                if(self.east_buffer[i]=="0"*34):
+                    return i
         elif(dir=="WEST"):
-            for i in range(4,0,-1):
-                self.west_buffer[i] = self.west_buffer[i-1]
-            self.west_buffer[0] = "0"*34
+            for i in range(0,5):
+                if(self.west_buffer[i]=="0"*34):
+                    return i
         elif(dir=="PE"):
-            for i in range(4,0,-1):
-                self.pe_buffer[i] = self.pe_buffer[i-1]
-            self.pe_buffer[0] = "0"*34
-            
+            for i in range(0,5):
+                if(self.pe_buffer[i]=="0"*34):
+                    return i
     def update(self):
-        if self.isempty_pe_buffer()==False:
-            self.startRouting('PE')
-        if self.isempty_east_buffer() == False:
-            self.startRouting('EAST')
-        if self.isempty_north_buffer() == False:
-            self.startRouting('NORTH')
-        if self.isempty_south_buffer() == False:
-            self.startRouting('SOUTH')
-        if self.isempty_west_buffer() == False:
-            self.startRouting('WEST')
-        if self.isempty_pe_buffer() == False:
-            self.startRouting('PE')
+        if self.send_flag==1:
+            self.send.send()
+            if(self.send.count==5):
+                self.send_flag= 0
+            pass
+        elif self.isempty_pe_buffer()==False:
+            print('1')
+            self.send= Sending(self, self.pe_buffer)
+            self.pe_buffer= ["0"*34]*5
+            self.send_flag= 1
+        elif self.isempty_west_buffer()==False:
+            print('2')
+            self.send= Sending(self, self.west_buffer)
+            self.west_buffer= ["0"*34]*5
+            self.send_flag= 1
+        elif self.isempty_north_buffer()==False:
+            print('3')
+            self.send= Sending(self, self.north_buffer)
+            self.north_buffer= ["0"*34]*5
+            self.send_flag= 1
+        elif self.isempty_east_buffer()==False:
+            print('4')
+            self.send= Sending(self, self.east_buffer)
+            self.east_buffer= ["0"*34]*5
+            self.send_flag= 1
+        elif self.isempty_south_buffer()==False:
+            print('5')
+            self.send= Sending(self, self.south_buffer)
+            self.south_buffer= ["0"*34]*5
+            self.send_flag= 1
+        
+        # if self.isempty_pe_buffer()==True:
+        #     self.startRouting('PE')
+        # if self.isempty_east_buffer() == False:
+        #     self.startRouting('EAST')
+        # if self.isempty_north_buffer() == False:
+        #     self.startRouting('NORTH')
+        # if self.isempty_south_buffer() == False:
+        #     self.startRouting('SOUTH')
+
+        # self.startRouting('WEST')
+        
+        # if self.isempty_pe_buffer() == False:
+        #     self.startRouting('PE')
 
     def startRouting(self,dir):
            
@@ -216,21 +247,16 @@ class Router():
                 elif(moveY == self.YCurrent - 1):
                     self.crossbar.makeconnection(router_send,self.pe_input_port,self.west_output_port,"EAST")
                 elif(moveY == self.YCurrent + 1):
-                    print('YOOOOOOO')
                     self.crossbar.makeconnection(router_send,self.pe_input_port,self.east_output_port,"WEST")
                 self.crossbar.sendFlit(self.pe_input_port,self.pe_buffer[0])
                 self.shiftPEBuffer()
-                print('PE HEAD BUFFER: ',self.pe_buffer[0])
             
             if(self.pe_buffer[0][32:] == '01'):
-                print('YOOOOOOOBODY')
                 self.crossbar.sendFlit(self.pe_input_port,self.pe_buffer[0])
                 self.shiftPEBuffer()
-                print('PE BUFFER: ',self.pe_buffer[0])
 
             
             if(self.pe_buffer[0][32:] == '10'):
-                print('YOOOOOOOTAIL')
                 self.crossbar.sendFlit(self.pe_input_port,self.pe_buffer[0])
                 self.shiftPEBuffer()
                 self.crossbar.deleteConnection(self.pe_input_port)
@@ -318,5 +344,3 @@ class Router():
                 self.crossbar.sendFlit(self.west_input_port,self.west_buffer[0])
                 self.shiftWBuffer()
                 self.crossbar.deleteConnection(self.west_input_port)
-        
-        

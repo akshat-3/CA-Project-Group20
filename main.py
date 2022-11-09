@@ -28,7 +28,6 @@ for line in input:
     input_line = [injectCycle,source,dest]+packet.flit()
     processed_input.append(input_line)
 
-print(processed_input)
 clk = Clock.Clock()
 clk.startClock()
 Mesh2D = Mesh()

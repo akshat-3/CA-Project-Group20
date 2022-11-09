@@ -27,18 +27,17 @@ class CrossBar:
         for i in self.currentConnected:
             if i[1] == master:
                 if(i[3] == "NORTH"):
-                    i[0].buffer_shuffle(i[3])
-                    i[0].north_buffer[0] = flit
+                    pos = i[0].buffer_shuffle(i[3])
+                    i[0].north_buffer[pos] = flit
                 if(i[3] == "EAST"):
-                    i[0].buffer_shuffle(i[3])
-                    i[0].east_buffer[0] = flit
+                    pos = i[0].buffer_shuffle(i[3])
+                    i[0].east_buffer[pos] = flit
                 if(i[3] == "WEST"):
-                    i[0].buffer_shuffle(i[3])
-                    i[0].west_buffer[0] = flit
-                    print(i[0].west_buffer)
+                    pos = i[0].buffer_shuffle(i[3])
+                    i[0].west_buffer[pos] = flit
                 if(i[3] == "SOUTH"):
-                    i[0].buffer_shuffle(i[3])
-                    i[0].south_buffer[0] = flit
+                    pos = i[0].buffer_shuffle(i[3])
+                    i[0].south_buffer[pos] = flit
 
 
     def deleteConnection(self, master):
@@ -53,7 +52,6 @@ class CrossBar:
         else:
             if(dir == "NORTH"):
                 if(next.isempty_north_buffer()):
-                    print('hello')
                     return True
             if(dir == "EAST"):
                 if(next.isempty_east_buffer()):
