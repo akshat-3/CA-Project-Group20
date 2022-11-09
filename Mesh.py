@@ -15,6 +15,8 @@ class Mesh():
         self.router_c.neighbour_list = [self.router_b, self.router_d]
         self.router_d.neighbour_list = [self.router_a, self.router_c]
 
+
+
         port_ab= Port()
         self.router_a.east_input_port= port_ab
         self.router_b.west_output_port= port_ab
@@ -54,6 +56,11 @@ class Mesh():
         self.router_d.north_output_port= port_ad
         self.router_a.south_input_port= port_ad
         port_ad.setPort(self.router_a, self.router_d)
+
+        self.router_a.ports_list = [port_ab, port_ad]
+        self.router_b.ports_list = [port_ba, port_bc]
+        self.router_c.ports_list = [port_cb, port_cd]
+        self.router_d.ports_list = [port_da, port_dc]
     
     def buff_check(self):
         if(self.router_a.pe_buffer[0]!=["0"*34]):
@@ -85,10 +92,22 @@ class Mesh():
         return "Actions bhay router wale"
 
     def update(self):
-        pass
+        self.router_a.update()
+        self.router_b.update()
+        self.router_c.update()
+        self.router_d.update()
     
-    def inject(self, s):
-        #if source buffer has space then push
+    def injectPacket(self, flit,count,source):
+        if(source=='A'):
+            self.router_a.pe_buffer[count] = flit
+        elif(source=='B'):
+            self.router_b.pe_buffer[count]=flit
+        elif(source=='C'):
+            self.router_c.pe_buffer[count]=flit
+        elif(source=='D'):
+            self.router_d.pe_buffer[count]=flit
+        return 1
+
 
     def readInp(self, s):
 
