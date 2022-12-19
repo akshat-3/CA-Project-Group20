@@ -5,6 +5,16 @@ from Mesh import *
 import logging
 import argparse
 
+import signal
+import sys
+
+def signal_handler(sig, frame):
+    print('\nSimulation Ended')
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
+
+
 parser = argparse.ArgumentParser()
 parser.add_argument("-t", "--traffic", help="Input Traffic File")
 parser.add_argument("-r", "--routing", help="Routing Algorithm to use")
@@ -51,6 +61,7 @@ clk.startClock()
 Mesh2D = Mesh()
 i = 0
 open('Logfile.log', 'w').close()
+addition_flag = 0
 #assuming in order traffic only
 print("Simulation Started. Press Ctrl+C to stop")
 while(1):
@@ -62,14 +73,17 @@ while(1):
                 if flag == 1:
                     logger.info('Router: ' + processed_input[i][1] + " Received from PE at clock cycle: "+ str(clk.count) +' Flit received: '+ processed_input[i][j])
                     processed_input[i][j] = "0"*34
+                    addition_flag = 1
                     break
                 else:
                     break
             elif (processed_input[i][7] == "0"*34):
                 i+=1
                 break
-        
-    Mesh2D.update(clk.count, args.routing)
-    clk.updateCycle()
+    # else:
+    #     print('hello')    
+    value = Mesh2D.update(clk.count, args.routing)
+    if value >= 0:
+        clk.updateCycle()
 
 clk.stopClock()

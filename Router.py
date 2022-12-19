@@ -176,32 +176,43 @@ class Router():
             if(self.send.count==5):
                 #print('done', self.XCurrent, self.YCurrent)
                 self.send_flag = 0
-            pass
+                return -1
+            return 1
         elif self.isempty_pe_buffer()==False:
             #print('1')
             self.send= Sending(self, self.pe_buffer, 'PE',flag)
             self.pe_buffer= ["0"*34]*5
             self.send_flag= 1
+            return 1
+
         elif self.isempty_west_buffer()==False:
             #print('2')
             self.send= Sending(self, self.west_buffer, 'WEST',flag)
             self.west_buffer= ["0"*34]*5
             self.send_flag= 1
+            return 1
+
         elif self.isempty_north_buffer()==False:
             #print('3')
             self.send= Sending(self, self.north_buffer, 'NORTH',flag)
             self.north_buffer= ["0"*34]*5
             self.send_flag= 1
+            return 1
+
         elif self.isempty_east_buffer()==False:
             #print('4')
             self.send= Sending(self, self.east_buffer, 'EAST',flag)
             self.east_buffer= ["0"*34]*5
             self.send_flag= 1
+            return 1
+
         elif self.isempty_south_buffer()==False:
             #print('5')
             self.send= Sending(self, self.south_buffer, 'SOUTH',flag)
             self.south_buffer= ["0"*34]*5
             self.send_flag= 1
+            return 1
+        return 0
             #print('empty',self.XCurrent,self.YCurrent)
         
         # if self.isempty_pe_buffer()==True:
