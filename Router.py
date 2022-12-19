@@ -49,17 +49,29 @@ class Router():
         self.ports_list = []
 
 
-    def switchAllocator(self,Xdest,Ydest):
-        Xoffset = int(Xdest)-self.XCurrent
-        Yoffset = int(Ydest)-self.YCurrent
-        if Xoffset<0:
-            return self.XCurrent - 1,self.YCurrent
-        if Xoffset>0:
-            return self.XCurrent + 1,self.YCurrent
-        if Xoffset==0 and Yoffset<0:
-            return self.XCurrent, self.YCurrent - 1
-        if Xoffset==0 and Yoffset>0:
-            return self.XCurrent, self.YCurrent + 1
+    def switchAllocator(self,Xdest,Ydest, flag):
+        if flag == 'YX':
+            Xoffset = int(Xdest)-self.XCurrent
+            Yoffset = int(Ydest)-self.YCurrent
+            if Xoffset<0:
+                return self.XCurrent - 1,self.YCurrent
+            if Xoffset>0:
+                return self.XCurrent + 1,self.YCurrent
+            if Xoffset==0 and Yoffset<0:
+                return self.XCurrent, self.YCurrent - 1
+            if Xoffset==0 and Yoffset>0:
+                return self.XCurrent, self.YCurrent + 1
+        elif flag == 'XY':
+            Xoffset = int(Xdest)-self.XCurrent
+            Yoffset = int(Ydest)-self.YCurrent
+            if Yoffset<0:
+                return self.XCurrent, self.YCurrent - 1
+            if Yoffset>0:
+                return self.XCurrent, self.YCurrent + 1
+            if Yoffset==0 and Xoffset<0:
+                return self.XCurrent - 1,self.YCurrent
+            if Yoffset==0 and Xoffset>0:
+                return self.XCurrent + 1,self.YCurrent
 
     def ifchannel(self, Xoff, Yoff):
         if Xoff==0 and Yoff==0:
@@ -157,7 +169,7 @@ class Router():
                 if(self.pe_buffer[i]=="0"*34):
                     return i
 
-    def update(self,clock):
+    def update(self,clock,flag):
         if self.send_flag==1:
             #print('count',self.send.count)
             self.send.send(clock)
@@ -167,27 +179,27 @@ class Router():
             pass
         elif self.isempty_pe_buffer()==False:
             #print('1')
-            self.send= Sending(self, self.pe_buffer, 'PE')
+            self.send= Sending(self, self.pe_buffer, 'PE',flag)
             self.pe_buffer= ["0"*34]*5
             self.send_flag= 1
         elif self.isempty_west_buffer()==False:
             #print('2')
-            self.send= Sending(self, self.west_buffer, 'WEST')
+            self.send= Sending(self, self.west_buffer, 'WEST',flag)
             self.west_buffer= ["0"*34]*5
             self.send_flag= 1
         elif self.isempty_north_buffer()==False:
             #print('3')
-            self.send= Sending(self, self.north_buffer, 'NORTH')
+            self.send= Sending(self, self.north_buffer, 'NORTH',flag)
             self.north_buffer= ["0"*34]*5
             self.send_flag= 1
         elif self.isempty_east_buffer()==False:
             #print('4')
-            self.send= Sending(self, self.east_buffer, 'EAST')
+            self.send= Sending(self, self.east_buffer, 'EAST',flag)
             self.east_buffer= ["0"*34]*5
             self.send_flag= 1
         elif self.isempty_south_buffer()==False:
             #print('5')
-            self.send= Sending(self, self.south_buffer, 'SOUTH')
+            self.send= Sending(self, self.south_buffer, 'SOUTH',flag)
             self.south_buffer= ["0"*34]*5
             self.send_flag= 1
             #print('empty',self.XCurrent,self.YCurrent)
@@ -231,7 +243,7 @@ class Router():
                 self.crossbar.sendFlit(self.north_input_port,self.north_buffer[0])
                 self.shiftNBuffer()
             
-            if(self.north_buffer[0][32:] == '10'):
+            if(self.north_buffer[0][32:] == '11'):
                 self.crossbar.sendFlit(self.north_input_port,self.north_buffer[0])
                 self.shiftNBuffer()
                 self.crossbar.deleteConnection(self.north_input_port)
@@ -260,7 +272,7 @@ class Router():
                 self.shiftPEBuffer()
 
             
-            if(self.pe_buffer[0][32:] == '10'):
+            if(self.pe_buffer[0][32:] == '11'):
                 self.crossbar.sendFlit(self.pe_input_port,self.pe_buffer[0])
                 self.shiftPEBuffer()
                 self.crossbar.deleteConnection(self.pe_input_port)
@@ -288,7 +300,7 @@ class Router():
                 self.crossbar.sendFlit(self.south_input_port,self.south_buffer[0])
                 self.shiftSBuffer()
             
-            if(self.south_buffer[0][32:] == '10'):
+            if(self.south_buffer[0][32:] == '11'):
                 self.crossbar.sendFlit(self.south_input_port,self.south_buffer[0])
                 self.shiftSBuffer()
                 self.crossbar.deleteConnection(self.south_input_port)
@@ -316,7 +328,7 @@ class Router():
                 self.crossbar.sendFlit(self.east_input_port,self.east_buffer[0])
                 self.shiftEBuffer()
             
-            if(self.east_buffer[0][32:] == '10'):
+            if(self.east_buffer[0][32:] == '11'):
                 self.crossbar.sendFlit(self.east_input_port,self.east_buffer[0])
                 self.shiftEBuffer()
                 self.crossbar.deleteConnection(self.east_input_port)
@@ -344,7 +356,7 @@ class Router():
                 self.crossbar.sendFlit(self.west_input_port,self.west_buffer[0])
                 self.shiftWBuffer()
             
-            if(self.west_buffer[0][32:] == '10'):
+            if(self.west_buffer[0][32:] == '11'):
                 self.crossbar.sendFlit(self.west_input_port,self.west_buffer[0])
                 self.shiftWBuffer()
                 self.crossbar.deleteConnection(self.west_input_port)

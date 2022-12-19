@@ -20,26 +20,31 @@ input = []
 
 for line in fileinput.input(files=args.traffic):
     A = line.split(' ')
+    if (len(A) == 1) and (A[0] == '\n'):
+        continue
     for i in range(len(A)):
         j = A[i]
         if (j == '\n' or j == '\r'):
             A.remove(j)
-        elif ('\r' in j):
-            j = j[0:len(j)-2]
+        elif ('\r' in j or '\n' in j):
+            j = j[0:len(j)-1]
             A[i] = j
+    print(A)
     if (len(A[-1]) == 96):
         input.append(A)
 
 processed_input = []
-
+count = 0
 for line in input:
+    #print(count)
     injectCycle = line[0]
     source = line[1]
     dest = line[2]
     payload = line[3]
-    packet = Packet.Packet(payload, source, dest, injectCycle)
+    packet = Packet.Packet(payload, source, dest, injectCycle,count)
     input_line = [injectCycle,source,dest]+packet.flit()
     processed_input.append(input_line)
+    count+=1
 
 clk = Clock.Clock()
 clk.startClock()
@@ -55,7 +60,7 @@ while(1):
             if processed_input[i][j] != "0"*34:
                 flag = Mesh2D.injectPacket(processed_input[i][j], j - 3, processed_input[i][1])
                 if flag == 1:
-                    logger.info('For Router: ' + processed_input[i][1] + " Injected at clock cycle: "+ str(clk.count) +' Flit received: '+ processed_input[i][j])
+                    logger.info('Router: ' + processed_input[i][1] + " Received from PE at clock cycle: "+ str(clk.count) +' Flit received: '+ processed_input[i][j])
                     processed_input[i][j] = "0"*34
                     break
                 else:
@@ -64,7 +69,7 @@ while(1):
                 i+=1
                 break
         
-    Mesh2D.update(clk.count)
+    Mesh2D.update(clk.count, args.routing)
     clk.updateCycle()
 
 clk.stopClock()

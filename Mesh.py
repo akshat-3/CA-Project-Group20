@@ -91,11 +91,11 @@ class Mesh():
     # def dummy(self):
     #     return "Actions bhay router wale"
 
-    def update(self,clock):
-        self.router_a.update(clock)
-        self.router_b.update(clock)
-        self.router_c.update(clock)
-        self.router_d.update(clock)
+    def update(self,clock,flag):
+        self.router_a.update(clock,flag)
+        self.router_b.update(clock,flag)
+        self.router_c.update(clock,flag)
+        self.router_d.update(clock,flag)
     
     def injectPacket(self, flit,count,source):
         if(source=='A'):

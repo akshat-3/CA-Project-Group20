@@ -6,7 +6,7 @@ logger.setLevel(logging.DEBUG)
 
 
 class Sending:
-    def __init__(self, Router, buffer, direction):
+    def __init__(self, Router, buffer, direction,flag):
         #print('helo')
         self.count = 0
         self.buffer = buffer
@@ -14,10 +14,10 @@ class Sending:
         self.router_send = None
         self.dict = {'00':'A','01':'B','11':'C','10':'D'}
         self.directions = direction
-        self.calculateReceiver()
+        self.calculateReceiver(flag)
         
 
-    def calculateReceiver(self):
+    def calculateReceiver(self,flag):
         #print('bufer',self.buffer)
         if self.router.XCurrent == int(self.buffer[0][28]) and self.router.YCurrent == int(self.buffer[0][29]):
             #print("halo\n")
@@ -35,7 +35,7 @@ class Sending:
                     self.router.pe_buffer = ["0"*34]*5
             
         else:
-            moveX,moveY = self.router.switchAllocator(self.buffer[0][28],self.buffer[0][29])
+            moveX,moveY = self.router.switchAllocator(self.buffer[0][28],self.buffer[0][29], flag)
             if(self.router.neighbour_list[0].XCurrent == moveX and self.router.neighbour_list[0].YCurrent == moveY):
                 self.router_send = self.router.neighbour_list[0]
             if(self.router.neighbour_list[1].XCurrent == moveX and self.router.neighbour_list[1].YCurrent == moveY):
@@ -58,7 +58,7 @@ class Sending:
         if(self.router_send != None):
             route = self.dict[str(self.router_send.XCurrent)+str(self.router_send.YCurrent)]
             route_self = self.dict[str(self.router.XCurrent)+str(self.router.YCurrent)]
-            logger.info('Router: ' + route + " Received from router " +route_self+ " at clock cycle: "+ str(clock) +  ' Flit received: '+ self.buffer[self.count])
+            logger.info('Router: ' + route + " Received from " +route_self+ " at clock cycle: "+ str(clock) +  ' Flit received: '+ self.buffer[self.count])
             if(self.direction == "NORTH"):
                 self.router_send.north_buffer[self.count] = self.buffer[self.count]
                 #print(self.router_send.north_buffer[self.count])
